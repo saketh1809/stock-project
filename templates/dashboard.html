@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Stock Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; display: flex; height: 100vh; }
+    .sidebar { width: 250px; background: #f4f6f8; padding: 20px; overflow-y: auto; border-right: 1px solid #ccc; }
+    .sidebar li { margin: 10px 0; cursor: pointer; color: #0078D4; }
+    .sidebar li:hover { text-decoration: underline; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .header { display: flex; justify-content: space-between; align-items: center; background: #0078D4; border-bottom: 1px solid #ccc; }
+    .header h2 { margin: 0; font-size: 10px; }
+    .Titte { flex: 2; max-width: 70%;}
+    .controls { background: #fff; display: flex; gap: 10px; }
+    .header button {
+      padding: 6px 12px; border: none; background-color: #ffffff;
+      color: rgb(5, 5, 5); border-radius: 40px; cursor: pointer; font-weight: bold;
+    }
+    .controls button {
+      padding: 6px 12px; border: none; background-color: #0078D4;
+      color: rgb(5, 5, 5); border-radius: 40px; cursor: pointer; font-weight: bold;
+    }
+    .controls button:hover, .header button:hover { background-color: #000000; }
+    .container { display: flex; flex: 1; }
+    #chart-box { padding: 20px; flex: 2; max-width: 70%; }
+    canvas#chart { max-height: 250px; }
+    .stats { margin-top: 10px; font-size: 14px; }
+    .info-sidebar { width: 300px; background: #f9f9f9; padding: 8px; border-left: 1px solid #ccc; overflow-y: auto; }
+    .info-sidebar img { margin-bottom: 1px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h3>📌 My Stocks</h3>
+    <ul>
+      <li onclick="loadStock('RELIANCE.NS')">Reliance Industries Ltd</li>
+      <li onclick="loadStock('TATASTEEL.NS')">Tata Steel Ltd</li>
+      <li onclick="loadStock('MOSCHIP.NS')">Moschip Technologies Ltd</li>
+      <li onclick="loadStock('BEL.NS')">Bharat Electronics Ltd</li>
+      <li onclick="loadStock('CONCOR.NS')">Container Corporation of India Ltd</li>
+      <li onclick="loadStock('IRFC.NS')">Indian Railway Finance Corp Ltd</li>
+      <li onclick="loadStock('POWERGRID.NS')">Power Grid Corp of India Ltd</li>
+      <li onclick="loadStock('ZENTECH.NS')">Zen Technologies Ltd</li>
+      <li onclick="loadStock('ASTRAMICRO.NS')">Astra Microwave Products Ltd</li>
+      <li onclick="loadStock('TIINDIA.NS')">Tube Investments of India Ltd</li>
+      <li onclick="loadStock('TATAMOTORS.NS')">Tata Motors Ltd</li>
+      <li onclick="loadStock('DIXON.NS')">Dixon Technologies (India) Ltd</li>
+      <li onclick="loadStock('HCLTECH.NS')">HCL Technologies Ltd</li>
+      <li onclick="loadStock('VBL.NS')">Varun Beverages Ltd</li>
+      <li onclick="loadStock('WESTLIFE.NS')">Westlife Foodworld Ltd</li>
+      <li onclick="loadStock('MSTCLTD.NS')">MSTC Ltd</li>
+      <li onclick="loadStock('TCS.NS')">TCS Ltd</li>
+    </ul>
+  </div>
+
+<div class="main">
+    <div class="header">
+      <h1 id="text">📈Stock Market</h1>
+      <div>
+        <span id="datetime"></span>
+        <button onclick="location.href='/home'">Dashboard</button>
+      </div>
+    </div>
+    <div class="Tittle">
+      <h3 id="stock-title"> Select a Stock</h3>
+    </div>
+    <div class="controls">
+      <button onclick="changePeriod('1d')">1 Day</button>
+      <button onclick="changePeriod('5d')">5 Days</button>
+      <button onclick="changePeriod('1mo')">1 Month</button>
+      <button onclick="changePeriod('6mo')">6 Months</button>
+      <button onclick="changePeriod('1y')">1 Year</button>
+    </div>
+
+    <div class="container">
+      <div id="chart-box">
+        <canvas id="chart"></canvas>
+        <div class="stats">
+          <span>High: <strong id="high-val">—</strong></span> |
+          <span>Low: <strong id="low-val">—</strong></span>
+        </div>
+      </div>
+
+      <div class="info-sidebar">
+        <img id="logo" src="" alt="" width="100">
+        <h3 id="company-name">–</h3>
+        <p id="about">–</p>
+        <ul>
+          <li><strong>Sector:</strong> <span id="sector">–</span></li>
+          <li><strong>Industry:</strong> <span id="industry">–</span></li>
+          <li><strong>Website:</strong> <a id="website" href="" target="_blank">–</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chart, currentSymbol='', currentPeriod='1mo';
+
+    function updateDateTime() {
+      const now = new Date();
+      const opts = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      document.getElementById('datetime').innerText = now.toLocaleDateString('en-IN', opts) + ' ' + now.toLocaleTimeString('en-IN');
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    function changePeriod(p) {
+      currentPeriod = p;
+      if (currentSymbol) loadStock(currentSymbol);
+    }
+
+    function loadStock(symbol) {
+      currentSymbol = symbol;
+      fetch(`/api/data?symbol=${symbol}&period=${currentPeriod}`)
+        .then(res => res.json())
+        .then(d => {
+          document.getElementById('stock-title').innerText = `${d.name} (${d.symbol}) - ₹${d.price.toFixed(2)}`;
+          document.getElementById('high-val').innerText = d.high?.toFixed(2) || '–';
+          document.getElementById('low-val').innerText = d.low?.toFixed(2) || '–';
+
+          if (chart) chart.destroy();
+          chart = new Chart(document.getElementById('chart'), {
+            type: 'line',
+            data: {
+              labels: d.timestamps,
+              datasets: [{
+                data: d.prices,
+                borderColor: '#0078D4',
+                fill: false
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: { x: { ticks: { maxTicksLimit: 10 } } }
+            }
+          });
+
+          document.getElementById('logo').src = d.logo_url || '';
+          document.getElementById('company-name').innerText = d.name;
+          document.getElementById('about').innerText = d.about;
+          document.getElementById('sector').innerText = d.sector;
+          document.getElementById('industry').innerText = d.industry;
+          const wl = document.getElementById('website');
+          wl.href = d.website;
+          wl.textContent = d.website;
+        });
+    }
+  </script>
+</body>
+</html>
