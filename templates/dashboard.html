@@ -4,32 +4,215 @@
   <meta charset="UTF-8">
   <title>📊 Stock Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; display: flex; height: 100vh; }
-    .sidebar { width: 250px; background: #f4f6f8; padding: 20px; overflow-y: auto; border-right: 1px solid #ccc; }
-    .sidebar li { margin: 10px 0; cursor: pointer; color: #0078D4; }
-    .sidebar li:hover { text-decoration: underline; }
-    .main { flex: 1; display: flex; flex-direction: column; }
-    .header { display: flex; justify-content: space-between; align-items: center; background: #0078D4; border-bottom: 1px solid #ccc; }
-    .header h2 { margin: 0; font-size: 10px; }
-    .Titte { flex: 2; max-width: 70%;}
-    .controls { background: #fff; display: flex; gap: 10px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: url('/static/background.jpg') no-repeat center center/cover;
+      color: #162938;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      border-right: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 20px;
+      overflow-y: auto;
+      color: #fff;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar li:hover {
+      background: rgba(255, 255, 255, 0.4);
+      color: #162938;
+      font-weight: 600;
+    }
+
+    /* Main Section */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(20px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(255, 255, 255, 0.25);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      color: #162938;
+    }
+
+    .header h1 {
+      font-weight: 700;
+      color: #162938;
+    }
+
     .header button {
-      padding: 6px 12px; border: none; background-color: #ffffff;
-      color: rgb(5, 5, 5); border-radius: 40px; cursor: pointer; font-weight: bold;
+      padding: 10px 20px;
+      border: 2px solid #162938;
+      background: transparent;
+      color: #162938;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
+
+    .header button:hover {
+      background: #162938;
+      color: #fff;
+    }
+
+    #datetime {
+      font-weight: 500;
+      font-size: 0.9em;
+      color: #162938;
+    }
+
+    .title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.4em;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
     .controls button {
-      padding: 6px 12px; border: none; background-color: #0078D4;
-      color: rgb(5, 5, 5); border-radius: 40px; cursor: pointer; font-weight: bold;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 25px;
+      background: #162938;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
-    .controls button:hover, .header button:hover { background-color: #000000; }
-    .container { display: flex; flex: 1; }
-    #chart-box { padding: 20px; flex: 2; max-width: 70%; }
-    canvas#chart { max-height: 250px; }
-    .stats { margin-top: 10px; font-size: 14px; }
-    .info-sidebar { width: 300px; background: #f9f9f9; padding: 8px; border-left: 1px solid #ccc; overflow-y: auto; }
-    .info-sidebar img { margin-bottom: 1px; }
+
+    .controls button:hover {
+      background: #fff;
+      color: #162938;
+      border: 1px solid #162938;
+    }
+
+    /* Main container for chart + info */
+    .container {
+      display: flex;
+      flex: 1;
+      padding: 20px 40px;
+      gap: 20px;
+    }
+
+    /* Chart box */
+    #chart-box {
+      flex: 2;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    canvas#chart {
+      width: 100%;
+      height: 300px;
+    }
+
+    .stats {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      color: #162938;
+    }
+
+    /* Right Info Panel */
+    .info-sidebar {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(15px);
+      color: #162938;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .info-sidebar img {
+      display: block;
+      margin: 0 auto 10px auto;
+      border-radius: 10px;
+    }
+
+    .info-sidebar h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .info-sidebar p {
+      font-size: 0.9em;
+      text-align: justify;
+      color: #162938;
+    }
+
+    .info-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    .info-sidebar li {
+      margin: 5px 0;
+      font-size: 0.95em;
+    }
+
+    .info-sidebar a {
+      color: #162938;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .info-sidebar a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -56,23 +239,25 @@
     </ul>
   </div>
 
-<div class="main">
+  <div class="main">
     <div class="header">
-      <h1 id="text">📈Stock Market</h1>
+      <h1>📈 Stock Dashboard</h1>
       <div>
         <span id="datetime"></span>
-        <button onclick="location.href='/home'">Dashboard</button>
+        <button onclick="location.href='/home'">🏠 Home</button>
       </div>
     </div>
-    <div class="Tittle">
-      <h3 id="stock-title"> Select a Stock</h3>
+
+    <div class="title">
+      <h3 id="stock-title">Select a Stock</h3>
     </div>
+
     <div class="controls">
-      <button onclick="changePeriod('1d')">1 Day</button>
-      <button onclick="changePeriod('5d')">5 Days</button>
-      <button onclick="changePeriod('1mo')">1 Month</button>
-      <button onclick="changePeriod('6mo')">6 Months</button>
-      <button onclick="changePeriod('1y')">1 Year</button>
+      <button onclick="changePeriod('1d')">1D</button>
+      <button onclick="changePeriod('5d')">5D</button>
+      <button onclick="changePeriod('1mo')">1M</button>
+      <button onclick="changePeriod('6mo')">6M</button>
+      <button onclick="changePeriod('1y')">1Y</button>
     </div>
 
     <div class="container">
@@ -85,25 +270,26 @@
       </div>
 
       <div class="info-sidebar">
-        <img id="logo" src="" alt="" width="100">
+        <img id="logo" src="" alt="Company Logo" width="100">
         <h3 id="company-name">–</h3>
         <p id="about">–</p>
         <ul>
           <li><strong>Sector:</strong> <span id="sector">–</span></li>
           <li><strong>Industry:</strong> <span id="industry">–</span></li>
-          <li><strong>Website:</strong> <a id="website" href="" target="_blank">–</a></li>
+          <li><strong>Website:</strong> <a id="website" href="#" target="_blank">–</a></li>
         </ul>
       </div>
     </div>
   </div>
 
   <script>
-    let chart, currentSymbol='', currentPeriod='1mo';
+    let chart, currentSymbol = '', currentPeriod = '1mo';
 
     function updateDateTime() {
       const now = new Date();
       const opts = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-      document.getElementById('datetime').innerText = now.toLocaleDateString('en-IN', opts) + ' ' + now.toLocaleTimeString('en-IN');
+      document.getElementById('datetime').innerText = 
+        now.toLocaleDateString('en-IN', opts) + ' ' + now.toLocaleTimeString('en-IN');
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
@@ -129,8 +315,10 @@
               labels: d.timestamps,
               datasets: [{
                 data: d.prices,
-                borderColor: '#0078D4',
-                fill: false
+                borderColor: '#162938',
+                borderWidth: 2,
+                fill: true,
+                backgroundColor: 'rgba(22,41,56,0.1)'
               }]
             },
             options: {

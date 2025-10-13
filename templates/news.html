@@ -2,125 +2,139 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🗞️ Top News Headlines</title>
+  <title>🗞️ News Dashboard</title>
   <style>
+    /* General Styles */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 0;
-      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fb;
+      color: #222;
     }
 
     header {
-      background: #0078D4;
-      color: white;
-      padding: 20px;
+      background-color: #ffffff;
+      color: #0078D4;
+      padding: 20px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     header h1 {
       margin: 0;
       font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .date-time {
       font-size: 14px;
-      color: #e2e2e2;
+      color: #666;
       margin-top: 4px;
       text-align: right;
     }
 
     .dashboard-btn {
-      background-color: #ffffff;
-      color: #0078D4;
+      background-color: #0078D4;
+      color: white;
       border: none;
-      padding: 8px 16px;
-      font-weight: bold;
-      border-radius: 6px;
+      padding: 10px 18px;
+      font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
     }
 
     .dashboard-btn:hover {
-      background-color: #dce8f4;
+      background-color: #005fa3;
+      transform: translateY(-1px);
     }
 
+    /* Main Container */
     .container {
-      padding: 30px;
       max-width: 1000px;
-      margin: auto;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
     }
 
+    /* News Cards */
     .news-item {
-      background: #fff;
+      background-color: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
-      flex-direction: row;
-      gap: 20px;
-      margin-bottom: 25px;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.07);
-      transition: transform 0.2s;
+      flex-direction: column;
     }
 
     .news-item:hover {
-      transform: scale(1.01);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     }
 
-    .news-img {
-      flex-shrink: 0;
-      width: 150px;
-      height: 100px;
-      border-radius: 8px;
+    .news-image {
+      width: 100%;
+      height: 220px;
       object-fit: cover;
     }
 
     .news-content {
-      flex-grow: 1;
+      padding: 20px;
     }
 
     .news-content h3 {
       margin: 0 0 10px;
-      font-size: 18px;
+      font-size: 20px;
       color: #0078D4;
     }
 
     .news-content h3 a {
       text-decoration: none;
-      color: #0078D4;
+      color: inherit;
+      transition: color 0.3s;
+    }
+
+    .news-content h3 a:hover {
+      color: #005fa3;
     }
 
     .news-content p {
-      margin: 0 0 8px;
-      font-size: 14px;
+      margin: 0 0 12px;
+      font-size: 15px;
+      line-height: 1.5;
       color: #333;
     }
 
     .news-content small {
-      font-size: 12px;
-      color: #888;
+      font-size: 13px;
+      color: #777;
     }
 
+    /* Responsive Layout */
     @media screen and (max-width: 768px) {
-      .news-item {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .news-img {
-        width: 100%;
-        height: auto;
-      }
-
       header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 10px;
       }
 
       .date-time {
         text-align: left;
-        margin-top: 10px;
+      }
+
+      .news-image {
+        height: 180px;
       }
     }
   </style>
@@ -128,26 +142,28 @@
 <body>
   <header>
     <div>
-      <h1>🗞️ Top News Headlines</h1>
+      <h1>🗞️ News Dashboard</h1>
       <div class="date-time">
         {{ now.strftime('%A, %d %B %Y - %I:%M %p') }}
       </div>
     </div>
-    <button class="dashboard-btn" onclick="location.href='/home'">Dashboard</button>
+    <button class="dashboard-btn" onclick="location.href='/home'">🏠 Dashboard</button>
   </header>
 
   <div class="container">
     {% if news %}
       {% for article in news %}
         <div class="news-item">
-            <img src="{{ article.image_url }}" alt="news image" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 5px;">
+          <img src="{{ article.image_url }}" alt="news image" class="news-image">
+          <div class="news-content">
             <h3><a href="{{ article.link }}" target="_blank">{{ article.title }}</a></h3>
             <p>{{ article.description }}</p>
-            <small>Source: {{ article.source }} | {{ article.publishedAt }}</small>
-            </div>
+            <small>📰 {{ article.source }} | {{ article.publishedAt }}</small>
+          </div>
+        </div>
       {% endfor %}
     {% else %}
-      <p>No news articles found for today.</p>
+      <p style="text-align:center; color:#555;">No news articles found for today.</p>
     {% endif %}
   </div>
 </body>
