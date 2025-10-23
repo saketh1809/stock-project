@@ -35,7 +35,7 @@
       text-align: center;
       font-size: 1.4em;
       margin-bottom: 20px;
-      color: #fff;
+      color: #ffffff;
     }
 
     .sidebar ul {
@@ -46,7 +46,7 @@
       padding: 10px;
       margin: 8px 0;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
       cursor: pointer;
       transition: all 0.3s ease;
     }
@@ -72,19 +72,19 @@
       padding: 20px 40px;
       background: rgba(255, 255, 255, 0.25);
       border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-      color: #162938;
+      color: #000000;
     }
 
     .header h1 {
       font-weight: 700;
-      color: #162938;
+      color: #000000;
     }
 
     .header button {
       padding: 10px 20px;
       border: 2px solid #162938;
       background: transparent;
-      color: #162938;
+      color: #000000;
       border-radius: 25px;
       font-weight: 600;
       cursor: pointer;
@@ -99,20 +99,23 @@
     #datetime {
       font-weight: 500;
       font-size: 0.9em;
-      color: #162938;
+      color: #000000;
     }
 
     .title {
       text-align: center;
       margin: 20px 0;
+      font-family: 'Times New Roman', Times, serif;
       font-size: 1.4em;
-      font-weight: 600;
+      font-weight: 500;
+      color: #fff;
     }
 
     .controls {
       display: flex;
       justify-content: center;
       gap: 10px;
+      margin-top: 15px;
       margin-bottom: 15px;
     }
 
@@ -137,14 +140,14 @@
     .container {
       display: flex;
       flex: 1;
-      padding: 20px 40px;
+      padding: 5px 40px;
       gap: 20px;
     }
 
     /* Chart box */
     #chart-box {
       flex: 2;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.681);
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
@@ -217,7 +220,7 @@
 </head>
 <body>
   <div class="sidebar">
-    <h3>📌 My Stocks</h3>
+    <h3>Watchlist</h3>
     <ul>
       <li onclick="loadStock('RELIANCE.NS')">Reliance Industries Ltd</li>
       <li onclick="loadStock('TATASTEEL.NS')">Tata Steel Ltd</li>
@@ -252,14 +255,6 @@
       <h3 id="stock-title">Select a Stock</h3>
     </div>
 
-    <div class="controls">
-      <button onclick="changePeriod('1d')">1D</button>
-      <button onclick="changePeriod('5d')">5D</button>
-      <button onclick="changePeriod('1mo')">1M</button>
-      <button onclick="changePeriod('6mo')">6M</button>
-      <button onclick="changePeriod('1y')">1Y</button>
-    </div>
-
     <div class="container">
       <div id="chart-box">
         <canvas id="chart"></canvas>
@@ -267,10 +262,18 @@
           <span>High: <strong id="high-val">—</strong></span> |
           <span>Low: <strong id="low-val">—</strong></span>
         </div>
+
+        <div class="controls">
+        <button onclick="changePeriod('1d')">1D</button>
+        <button onclick="changePeriod('5d')">5D</button>
+        <button onclick="changePeriod('1mo')">1M</button>
+        <button onclick="changePeriod('6mo')">6M</button>
+        <button onclick="changePeriod('1y')">1Y</button>
+      </div>
       </div>
 
       <div class="info-sidebar">
-        <img id="logo" src="" alt="Company Logo" width="100">
+        <!-- <img id="logo" src="" alt="Company Logo" width="100"> -->
         <h3 id="company-name">–</h3>
         <p id="about">–</p>
         <ul>
@@ -328,7 +331,7 @@
             }
           });
 
-          document.getElementById('logo').src = d.logo_url || '';
+//          document.getElementById('logo').src = d.logo_url || '';
           document.getElementById('company-name').innerText = d.name;
           document.getElementById('about').innerText = d.about;
           document.getElementById('sector').innerText = d.sector;

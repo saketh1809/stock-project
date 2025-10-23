@@ -54,19 +54,40 @@ def api_data():
         'sector': info.get('sector', ''),
         'industry': info.get('industry', ''),
         'website': info.get('website', ''),
-        'logo_url': info.get('logo_url', ''),
+        # 'logo_url': info.get('logo_url', ''),
     })
 
 @app.route('/news')
 def news():
+    import feedparser
+    from bs4 import BeautifulSoup
+    from datetime import datetime
+
     url = "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en"
     feed = feedparser.parse(url)
     news_items = []
-    for entry in feed.entries[:10]:
+
+    for entry in feed.entries[:50]:
+        # Try to get image from <media:content> or <enclosure>
+        image_url = None
+        if "media_content" in entry and len(entry.media_content) > 0:
+            image_url = entry.media_content[0].get("url")
+        elif "links" in entry:
+            for link in entry.links:
+                if link.get("type", "").startswith("image/"):
+                    image_url = link.get("href")
+                    break
+
+        # Fallback to scraping from summary HTML
+        if not image_url:
+            soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
+            img_tag = soup.find("img")
+            image_url = img_tag["src"] if img_tag else "/static/default-img.png"
+
+        # Extract text content
         soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
-        img_tag = soup.find("img")
-        image_url = img_tag["src"] if img_tag else "/static/default-news.jpg"
         text = soup.get_text().strip()
+
         news_items.append({
             'title': entry.get("title"),
             'link': entry.get("link"),
@@ -75,8 +96,10 @@ def news():
             'source': entry.get("source", {}).get("title", "Google News"),
             'image_url': image_url
         })
+
     now = datetime.now()
     return render_template("news.html", news=news_items, now=now)
+
 
 @app.route('/logout')
 def logout():
