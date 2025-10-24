@@ -220,7 +220,7 @@
 </head>
 <body>
   <div class="sidebar">
-    <h3>Watchlist</h3>
+    <h3>Stocks</h3>
       <!-- Search bar -->
   <input type="text" id="stock-search" placeholder="🔍 Search stock or symbol..." 
   style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 8px; border: none; outline: none;">
@@ -234,14 +234,16 @@
   display: none;
 "></ul>
 
-<button id="watchlist-btn" onclick="toggleWatchlist()">⭐ Add to Watchlist</button>
+<div class="controls">
+  <button id="watchlist-btn" onclick="toggleWatchlist()">⭐ Add to Watchlist</button>
+</div>
 
   <h3>Watchlist</h3>
     <ul id="watchlist">
       <!-- This will be dynamically populated via JS -->
     </ul>
 
-    <ul id="stock-list">
+    <!-- <ul id="stock-list">
       <li onclick="loadStock('RELIANCE.NS')">Reliance Industries Ltd</li>
       <li onclick="loadStock('TATASTEEL.NS')">Tata Steel Ltd</li>
       <li onclick="loadStock('MOSCHIP.NS')">Moschip Technologies Ltd</li>
@@ -259,7 +261,7 @@
       <li onclick="loadStock('WESTLIFE.NS')">Westlife Foodworld Ltd</li>
       <li onclick="loadStock('MSTCLTD.NS')">MSTC Ltd</li>
       <li onclick="loadStock('TCS.NS')">TCS Ltd</li>
-    </ul>
+    </ul> -->
   </div>
 
   <div class="main">
@@ -281,6 +283,10 @@
         <div class="stats">
           <span>High: <strong id="high-val">—</strong></span> |
           <span>Low: <strong id="low-val">—</strong></span>
+          <!-- <p><strong>Market Cap:</strong> <span id="mkt-cap"></span></p>
+          <p><strong>P/E Ratio:</strong> <span id="pe-ratio"></span></p>
+          <p><strong>Dividend Yield:</strong> <span id="div-yield"></span></p>
+          <p><strong>Quarterly Dividend:</strong> <span id="div-amt"></span></p> -->
         </div>
 
         <div class="controls">
@@ -462,6 +468,10 @@ updateWatchlistButton(symbol);
           document.getElementById('stock-title').innerText = `${d.name} (${d.symbol}) - ₹${d.price.toFixed(2)}`;
           document.getElementById('high-val').innerText = d.high?.toFixed(2) || '–';
           document.getElementById('low-val').innerText = d.low?.toFixed(2) || '–';
+          // document.getElementById("mkt-cap").textContent = data.marketCap || "N/A";
+          // document.getElementById("pe-ratio").textContent = data.trailingPE || "N/A";
+          // document.getElementById("div-yield").textContent = data.dividendYield || "N/A";
+          // document.getElementById("div-amt").textContent = data.dividendRate || "N/A";
 
           if (chart) chart.destroy();
           chart = new Chart(document.getElementById('chart'), {

@@ -108,7 +108,7 @@ def search_stocks():
 
 @app.route('/api/data')
 def api_data():
-    symbol = request.args.get('symbol', 'TCS.NS')
+    symbol = request.args.get('symbol', 'TCS.NS').upper()
     period = request.args.get('period', '1mo')  # default 1 month
     tk = yf.Ticker(symbol)
     hist = tk.history(period=period, interval='1h' if period in ['1d', '5d'] else '1d')
@@ -124,7 +124,7 @@ def api_data():
     low = min(prices) if prices else None
     info = tk.info
     about = info.get('longBusinessSummary', '')
-    return jsonify({
+    data = {
         'symbol': symbol,
         'name': info.get('shortName', symbol),
         'price': prices[-1] if prices else 'N/A',
@@ -133,11 +133,26 @@ def api_data():
         'high': high,
         'low': low,
         'about': about[:225] + '...' if len(about) > 225 else about,
-        'sector': info.get('sector', ''),
-        'industry': info.get('industry', ''),
-        'website': info.get('website', ''),
+        'sector': info.get('sector', 'N/A'),
+        'industry': info.get('industry', 'N/A'),
+        'website': info.get('website', 'N/A'),
+        # 'previousClose': info.get('previousClose', 'N/A'),
+        # 'currency': info.get('currency', 'INR'),
+        # 'marketCap': info.get('marketCap', 'N/A'),
+        # 'trailingPE': info.get('trailingPE', 'N/A'),
+        # 'dividendYield': (
+        #     f"{round(info['dividendYield'] * 100, 2)}%" if info.get('dividendYield') else 'N/A'
+        # ),
+        # 'dividendRate': info.get('dividendRate', 'N/A'),
+        # 'quoteType': info.get('quoteType', 'N/A')
         # 'logo_url': info.get('logo_url', ''),
-    })
+    }
+    # Optional: For ETFs or Funds, modify how sector/industry appears
+    if info.get('quoteType') in ['ETF', 'MUTUALFUND']:
+        data['sector'] = 'Exchange-Traded Fund'
+        data['industry'] = info.get('category', 'N/A')
+
+    return jsonify(data)
 
 @app.route('/news')
 def news():
