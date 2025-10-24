@@ -221,7 +221,27 @@
 <body>
   <div class="sidebar">
     <h3>Watchlist</h3>
-    <ul>
+      <!-- Search bar -->
+  <input type="text" id="stock-search" placeholder="🔍 Search stock or symbol..." 
+  style="width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 8px; border: none; outline: none;">
+<ul id="suggestions" style="
+  list-style: none;
+  padding: 0;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+"></ul>
+
+<button id="watchlist-btn" onclick="toggleWatchlist()">⭐ Add to Watchlist</button>
+
+  <h3>Watchlist</h3>
+    <ul id="watchlist">
+      <!-- This will be dynamically populated via JS -->
+    </ul>
+
+    <ul id="stock-list">
       <li onclick="loadStock('RELIANCE.NS')">Reliance Industries Ltd</li>
       <li onclick="loadStock('TATASTEEL.NS')">Tata Steel Ltd</li>
       <li onclick="loadStock('MOSCHIP.NS')">Moschip Technologies Ltd</li>
@@ -297,16 +317,148 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
+  function filterStocks() {
+    const input = document.getElementById('stock-search').value.toLowerCase();
+    const listItems = document.querySelectorAll('#stock-list li');
+    listItems.forEach(li => {
+      if (li.innerText.toLowerCase().includes(input)) {
+        li.style.display = '';
+      } else {
+        li.style.display = 'none';
+      }
+    });
+  }
+
+  // --- Autocomplete Stock Search using Yahoo Finance ---
+const searchInput = document.getElementById('stock-search');
+const suggestionsList = document.getElementById('suggestions');
+
+let searchTimeout;
+
+// Trigger search on Enter key
+searchInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    const symbol = searchInput.value.trim().toUpperCase();
+    if (symbol) {
+      loadStock(symbol); // <-- Load stock data
+      suggestionsList.style.display = "none"; // Hide dropdown
+      searchInput.value = ""; // Clear search box
+    }
+  }
+});
+
+searchInput.addEventListener('input', () => {
+  const query = searchInput.value.trim();
+  if (query.length < 2) {
+    suggestionsList.style.display = 'none';
+    return;
+  }
+
+  fetch(`/api/search?query=${query}`)
+    .then(res => res.json())
+    .then(data => {
+      suggestionsList.innerHTML = "";
+      data.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} (${item.symbol})`;
+        li.style.padding = "6px 8px";
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => {
+          loadStock(item.symbol);
+          suggestionsList.style.display = "none";
+          searchInput.value = "";
+        });
+        suggestionsList.appendChild(li);
+      });
+      suggestionsList.style.display = "block";
+    })
+    .catch(err => console.error("Search error:", err));
+});
+
     function changePeriod(p) {
       currentPeriod = p;
       if (currentSymbol) loadStock(currentSymbol);
     }
+
+function loadWatchlist() {
+  fetch('/api/watchlist')
+    .then(res => res.json())
+    .then(data => {
+      const wl = document.getElementById('watchlist');
+      wl.innerHTML = '';
+      data.forEach(symbol => {
+        const li = document.createElement('li');
+        li.innerText = symbol;
+        li.onclick = () => loadStock(symbol);
+        wl.appendChild(li);
+      });
+    });
+}
+
+// Call on page load
+loadWatchlist();
+
+// Example: Add stock to watchlist
+function addToWatchlist(symbol) {
+  fetch('/api/watchlist', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({symbol})
+  }).then(() => loadWatchlist());
+}
+
+// Example: Remove stock from watchlist
+function removeFromWatchlist(symbol) {
+  fetch('/api/watchlist', {
+    method: 'DELETE',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({symbol})
+  }).then(() => loadWatchlist());
+}
+
+function toggleWatchlist() {
+  if (!currentSymbol) return;
+  const btn = document.getElementById('watchlist-btn');
+  if (btn.innerText.includes('Add')) {
+    addToWatchlist(currentSymbol);
+    btn.innerText = '⭐ Remove from Watchlist';
+  } else {
+    removeFromWatchlist(currentSymbol);
+    btn.innerText = '⭐ Add to Watchlist';
+  }
+}
+
+// Update button text when loading stock
+function updateWatchlistButton(symbol) {
+  fetch('/api/watchlist')
+    .then(res => res.json())
+    .then(data => {
+      const btn = document.getElementById('watchlist-btn');
+      btn.innerText = data.includes(symbol) ? '⭐ Remove from Watchlist' : '⭐ Add to Watchlist';
+    });
+}
+
+// Call inside loadStock()
+updateWatchlistButton(symbol);
 
     function loadStock(symbol) {
       currentSymbol = symbol;
       fetch(`/api/data?symbol=${symbol}&period=${currentPeriod}`)
         .then(res => res.json())
         .then(d => {
+          // If no prices are returned (maybe missing .NS suffix), try again with .NS
+      if (!d.prices || d.prices.length === 0) {
+        console.log("Retrying with .NS suffix...");
+        return fetch(`/api/data?symbol=${symbol}.NS&period=${currentPeriod}`)
+          .then(res => res.json());
+      }
+      return d;
+    })
+    .then(d => {
+      if (!d.prices || d.prices.length === 0) {
+        alert("No data found for " + symbol);
+        return;
+      }
           document.getElementById('stock-title').innerText = `${d.name} (${d.symbol}) - ₹${d.price.toFixed(2)}`;
           document.getElementById('high-val').innerText = d.high?.toFixed(2) || '–';
           document.getElementById('low-val').innerText = d.low?.toFixed(2) || '–';
@@ -339,8 +491,12 @@
           const wl = document.getElementById('website');
           wl.href = d.website;
           wl.textContent = d.website;
+
+          updateWatchlistButton(symbol);
         });
     }
+
+
   </script>
 </body>
 </html>

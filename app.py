@@ -5,9 +5,15 @@ from datetime import datetime
 import requests
 import feedparser
 from bs4 import BeautifulSoup
+from pymongo import MongoClient
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+
+# MongoDB connection
+client = MongoClient("mongodb://localhost:27017/")  # Local MongoDB
+db = client['stock_app']  # Database name
+users_collection = db['users']  # Collection name
 
 @app.route('/home')
 def home_dashboard():
@@ -18,11 +24,60 @@ def home_dashboard():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['username']=='saketh' and request.form['password']=='12345':
-            session['user'] = 'saketh'
+        username = request.form['username']
+        password = request.form['password']
+        user = users_collection.find_one({'username': username, 'password': password})
+        if user:
+            session['user'] = username
             return redirect('/home')
         return render_template('login.html', error='Invalid credentials')
     return render_template('login.html', error=None)
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+
+    if users_collection.find_one({'username': username}):
+        return render_template('login.html', error='Username already exists!')
+
+    users_collection.insert_one({
+        'username': username,
+        'email': email,
+        'password': password,
+        'watchlist': []
+    })
+    session['user'] = username
+    return redirect('/home')
+
+@app.route('/api/watchlist', methods=['GET', 'POST', 'DELETE'])
+def watchlist():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    user = users_collection.find_one({'username': session['user']})
+
+    if request.method == 'GET':
+        return jsonify(user.get('watchlist', []))
+
+    data = request.json
+    symbol = data.get('symbol')
+
+    if request.method == 'POST':
+        if symbol not in user.get('watchlist', []):
+            users_collection.update_one(
+                {'username': session['user']},
+                {'$push': {'watchlist': symbol}}
+            )
+        return jsonify({'status': 'added'})
+
+    if request.method == 'DELETE':
+        users_collection.update_one(
+            {'username': session['user']},
+            {'$pull': {'watchlist': symbol}}
+        )
+        return jsonify({'status': 'removed'})
 
 @app.route('/dashboard')
 def dashboard():
@@ -30,12 +85,39 @@ def dashboard():
         return redirect('/login')
     return render_template('dashboard.html')
 
+@app.route('/api/search')
+def search_stocks():
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify([])
+
+    url = f"https://query2.finance.yahoo.com/v1/finance/search?q={query}"
+    response = requests.get(url)
+    if response.status_code != 200:
+        return jsonify([])
+
+    results = response.json().get('quotes', [])
+    suggestions = []
+    for r in results:
+        if 'symbol' in r and 'shortname' in r:
+            suggestions.append({
+                'symbol': r['symbol'],
+                'name': r['shortname']
+            })
+    return jsonify(suggestions[:8])  # return top 8 suggestions
+
 @app.route('/api/data')
 def api_data():
     symbol = request.args.get('symbol', 'TCS.NS')
     period = request.args.get('period', '1mo')  # default 1 month
     tk = yf.Ticker(symbol)
     hist = tk.history(period=period, interval='1h' if period in ['1d', '5d'] else '1d')
+
+    # If empty data, try adding .NS suffix
+    if hist.empty and not symbol.endswith('.NS'):
+        tk = yf.Ticker(symbol + '.NS')
+        hist = tk.history(period=period, interval='1h' if period in ['1d', '5d'] else '1d')
+
     prices = hist['Close'].tolist()
     timestamps = [ts.strftime('%Y-%m-%d %H:%M' if period in ['1d', '5d'] else '%Y-%m-%d') for ts in hist.index]
     high = max(prices) if prices else None
