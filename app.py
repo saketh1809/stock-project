@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 # MongoDB connection
-client = MongoClient("mongodb://localhost:27017/")  # Local MongoDB
+client = MongoClient("mongodb+srv://admin:admin@cluster0.tgpyua2.mongodb.net/")  # MongoDB Atlas
 db = client['stock_app']  # Database name
 users_collection = db['users']  # Collection name
 
