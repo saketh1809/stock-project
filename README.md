@@ -6,4 +6,5 @@ To view the website (check the link below)
 
 for activating the venv
 >> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 >>.\venv\Scripts\activate
