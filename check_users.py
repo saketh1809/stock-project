@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://mongodb:27017/")
+client = MongoClient("mongodb://localhost:27017/")
 db = client['stock_app']
 users = db['users'].find()
 for user in users:
