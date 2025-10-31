@@ -1,3 +1,7 @@
+# Stock Dashboard (Flask + MongoDB + Docker)
+
+This is a **Flask-based backend** application connected to **MongoDB**, containerized using **Docker** for easy deployment and portability. 
+
 For converting the library files from venv to requirement.txt:
 
     venv\Scripts\pip freeze > requirements.txt
@@ -21,6 +25,7 @@ For pulling the docker image and deploying the application:
 a. docker image pulling:
 
     docker pull saketh1809/stock-app:latest
+
     docker run -d \
         -p 5000:5000 \
         -e MONGO_URI="mongodb://localhost:27017/stockdb" \
