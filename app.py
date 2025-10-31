@@ -6,15 +6,18 @@ import requests
 import feedparser
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 # MongoDB connection
 # client = MongoClient("mongodb+srv://admin:admin@cluster0.tgpyua2.mongodb.net/")  # MongoDB Atlas
-client = MongoClient("mongodb://localhost:27017/stockapp")  # MongoDB
-db = client['stock_app']  # Database name
-users_collection = db['users']  # Collection name
+# client = MongoClient("mongodb://localhost:27017/stockapp")  # MongoDB
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/stockapp")
+client = MongoClient(MONGO_URI)
+db = client['stock_app']
+users_collection = db['users']
 
 @app.route('/home')
 def home_dashboard():
