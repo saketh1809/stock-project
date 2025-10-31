@@ -13,7 +13,6 @@ app.secret_key = 'supersecretkey'
 # MongoDB connection
 # client = MongoClient("mongodb+srv://admin:admin@cluster0.tgpyua2.mongodb.net/")  # MongoDB Atlas
 client = MongoClient("mongodb://localhost:27017/stockapp")  # MongoDB
-# client = MongoClient("mongodb://mongo:27017/stock_app")  # MongoDB
 db = client['stock_app']  # Database name
 users_collection = db['users']  # Collection name
 
