@@ -1,36 +1,35 @@
-For converting the library files from venv to requirement.txt
->> venv\Scripts\pip freeze > requirements.txt
+For converting the library files from venv to requirement.txt:
+    venv\Scripts\pip freeze > requirements.txt
 
 To view the website #does not work (the application has database and render doesn't support docker-compose)
 >> https://my-stock-dashboard.onrender.com
 
-for activating the venv
->> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+for activating the venv:
+    
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
->>.\venv\Scripts\activate
+    .\venv\Scripts\activate
 
 For pulling the docker image and deploying the application:
-1. install docker and verify by :
-    >>  docker --version
+1. install docker and verify by:
 
-    >>  docker compose version
+    docker --version
+    docker compose version
 
 2. Deployment:
 a. docker image pulling:
-    >>  docker pull saketh1809/stock-app:latest
 
-    >>  docker run -d \
-            -p 5000:5000 \
-            -e MONGO_URI="mongodb://localhost:27017/stockdb" \
-            --name stock-app-backend \
-            saketh1809/stock-app:latest
+    docker pull saketh1809/stock-app:latest
+    docker run -d \
+        -p 5000:5000 \
+        -e MONGO_URI="mongodb://localhost:27017/stockdb" \
+        --name stock-app-backend \
+        saketh1809/stock-app:latest
 
 b. using docker-compose.yaml (complete setup):
 
-    git clone 
-
+    git clone https://github.com/saketh1809/stock-project.git
     cd stock-app
-
     docker compose up -d
 
 Key Note Points:
@@ -53,6 +52,5 @@ steps implemented:
 steps for deploying the docker image:
 
     docker build -t stock-app-backend .
-
     docker compose up
 
