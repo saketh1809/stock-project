@@ -16,7 +16,7 @@ For pulling the docker image and deploying the application:
     >>  docker compose version
 
 2. Deployment:
-2. a. docker image pulling:
+a. docker image pulling:
     >>  docker pull saketh1809/stock-app:latest
 
     >>  docker run -d \
@@ -25,19 +25,21 @@ For pulling the docker image and deploying the application:
             --name stock-app-backend \
             saketh1809/stock-app:latest
 
-2. b. using docker-compose.yaml (complete setup)
-    >>  git clone 
+b. using docker-compose.yaml (complete setup):
 
-    >>  cd stock-app
+    git clone 
 
-    >>  docker compose up -d
+    cd stock-app
+
+    docker compose up -d
 
 Key Note Points:
 
 1. if requirement.txt has pywin32 then remove or conditionally skip pywin32
 
 2. Switch to the Correct Docker Context, verify it by:
-    >>  docker context ls
+
+    docker context ls
 
 the output shoud be:
 
@@ -49,7 +51,8 @@ The asterisk * means Docker is now using the correct Linux engine (the same one 
 steps implemented:
 
 steps for deploying the docker image:
-    >>   docker build -t stock-app-backend .
 
-    >>  docker compose up
+    docker build -t stock-app-backend .
+
+    docker compose up
 
