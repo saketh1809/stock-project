@@ -65,36 +65,36 @@ steps for deploying the docker image:
 
 **Cloud Build + Cloud Run**
 
-Open Cloud Shell & set project
+Open Cloud Shell & set project:
     gcloud config set project YOUR_PROJECT_ID
     gcloud config set run/region us-central1
 
-Enable required services (one-time)
+Enable required services (one-time):
     gcloud services enable \
       run.googleapis.com \
       artifactregistry.googleapis.com \
       cloudbuild.googleapis.com
 
-Clone your repository
+Clone your repository:
     git clone https://github.com/saketh1809/stock-project.git
     cd stock-project
 
-Create Artifact Registry (one-time)
+Create Artifact Registry (one-time):
     gcloud artifacts repositories create stock-repo \
       --repository-format=docker \
       --location=us-central1 \
       --description="Stock App Docker Repo"
 
-Configure Docker authentication
+Configure Docker authentication:
     gcloud auth configure-docker us-central1-docker.pkg.dev
 
-Push image to Artifact Registry
+Push image to Artifact Registry:
     docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest
 
-Build Docker image
+Build Docker image:
     docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest .
   
-Cloud Build
+Cloud Build:
     gcloud builds submit \
       --tag us-central1-docker.pkg.dev/sanguine-link-480105-r9/stock-repo/stock-app:latest
 
