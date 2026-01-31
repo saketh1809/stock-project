@@ -16,7 +16,7 @@ app.secret_key = 'supersecretkey'
 # client = MongoClient("mongodb://localhost:27017/stockapp")  # MongoDB
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/stockapp")
 client = MongoClient(MONGO_URI)
-db = client['stock_app']
+db = client['stockapp']
 users_collection = db['users']
 
 @app.route('/home')
