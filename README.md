@@ -60,3 +60,18 @@ steps for deploying the docker image:
     docker build -t stock-app-backend .
     docker compose up
 
+
+**Deploying using Google Cloud Services **
+
+**Cloud Build + Cloud Run **
+
+Once Cloud Build finishes successfully, deploy:
+
+    gcloud run deploy stock-app \
+  --image us-central1-docker.pkg.dev/sanguine-link-480105-r9/stock-repo/stock-app:latest \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 5000 \
+  --set-env-vars MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/stockapp",SECRET_KEY="super-long-random-string"
+
