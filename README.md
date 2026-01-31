@@ -98,6 +98,7 @@ Push image to Artifact Registry:
     docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest
 
 Build Docker image:
+
     docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest .
   
 Cloud Build:
