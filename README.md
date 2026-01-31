@@ -104,7 +104,7 @@ Build Docker image:
 Cloud Build:
 
     gcloud builds submit \
-      --tag us-central1-docker.pkg.dev/sanguine-link-480105-r9/stock-repo/stock-app:latest
+      --tag us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest
 
 
 
