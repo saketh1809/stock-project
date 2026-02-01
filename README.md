@@ -2,66 +2,88 @@
 
 This is a **Flask-based backend** application connected to **MongoDB**, containerized using **Docker** for easy deployment and portability. 
 
-For converting the library files from venv to requirement.txt:
+**Deployment using Render:**
+
+>> https://my-stock-dashboard.onrender.com
+
+> ❌ The hosted link below **does not work properly**.
+
+The application depends on a database, and **Render does not support Docker Compose**, which is required for this setup.
+
+
+## Local Development (Using Virtual Environment)
+
+**Activate Virtual Environment (Windows):**
+
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+    .\venv\Scripts\activate
+
+**Generate requirements.txt:**
 
     venv\Scripts\pip freeze > requirements.txt
 
-To view the website #does not work (the application has database and render doesn't support docker-compose)
->> https://my-stock-dashboard.onrender.com
+-> If requirements.txt contains pywin32, remove it or conditionally skip it, as it causes issues in Linux/Docker environments.
 
-for activating the venv:
-    
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+**Docker Setup & Deployment:**
 
-    .\venv\Scripts\activate
-
-For pulling the docker image and deploying the application:
 1. install docker and verify by:
 
-    docker --version
-    docker compose version
-
-2. Deployment:
-a. docker image pulling:
-
-    docker pull saketh1809/stock-app:latest
-
-    docker run -d \
-        -p 5000:5000 \
-        -e MONGO_URI="mongodb://localhost:27017/stockdb" \
-        --name stock-app-backend \
-        saketh1809/stock-app:latest
-
-b. using docker-compose.yaml (complete setup):
-
-    git clone https://github.com/saketh1809/stock-project.git
-    cd stock-app
-    docker compose up -d
-
-Key Note Points:
-
-1. if requirement.txt has pywin32 then remove or conditionally skip pywin32
+        docker --version
+        docker compose version
 
 2. Switch to the Correct Docker Context, verify it by:
-
-    docker context ls
+   
+        docker context ls
 
 the output shoud be:
 
     default             moby
-    desktop-linux *     moby
+    desktop-linux *     moby    
 
-The asterisk * means Docker is now using the correct Linux engine (the same one used by Docker Desktop).
+## Deployment:
+**Option A: Pull and Run Docker Image**
 
-steps implemented:
+1. docker image pulling:
+
+        docker pull saketh1809/stock-app:latest
+
+2. Run the Container:
+   
+        docker run -d \
+            -p 5000:5000 \
+            -e MONGO_URI="mongodb://localhost:27017/stockdb" \
+            --name stock-app-backend \
+            saketh1809/stock-app:latest
+
+**Option B: Full Setup Using Docker Compose:**
+
+1. Clone the Repository:
+   
+    git clone https://github.com/saketh1809/stock-project.git
+    cd stock-app
+
+2. Start the Application:
+   
+    docker compose up -d
+
+This will:
+
+- Build the backend image
+- Start Flask backend
+- Start MongoDB
+- Connect all services automatically
+
+**Building the Docker Image (Manual)**
 
 steps for deploying the docker image:
 
     docker build -t stock-app-backend .
     docker compose up
+    
+The asterisk * means Docker is now using the correct Linux engine (the same one used by Docker Desktop).
 
 --------------------------------------------------------------------------------------------------------
-**Deploying using Google Cloud Services**
+# Deploying using Google Cloud Services
 
 **Cloud Shell + GKE + Docker + MongoDB**
 
