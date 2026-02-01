@@ -103,7 +103,30 @@ then confirm by:
 
     gcloud container images list
 
-    
+
+**4. Deploying on Kubernetes:**
+
+MongoDB Deployment:
+
+    kubectl apply -f mongo-deployment.yaml
+
+Replace PROJECT_ID variable to your PROJECT_ID:
+
+    sed -i "s/PROJECT_ID/$PROJECT_ID/g" app-deployment.yaml
+
+App Deployment:
+
+    kubectl apply -f app-deployment.yaml
+
+**5. Getting the External IP:**
+
+    kubectl get svc stock-app-service
+
+**6. Verify Everything Is Running:**
+
+    kubectl get pods
+    kubectl logs deployment/stock-app
+    kubectl logs deployment/mongodb
 
 
 ---------------------------------------------------------------------------------------------------------
