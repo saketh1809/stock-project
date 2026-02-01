@@ -103,6 +103,8 @@ then confirm by:
 
     gcloud container images list
 
+<img width="1919" height="1199" alt="image" src="https://github.com/user-attachments/assets/f10de17e-3939-42c4-a35f-5ee456dc7b7c" />
+
 
 **4. Deploying on Kubernetes:**
 
@@ -128,6 +130,7 @@ App Deployment:
     kubectl logs deployment/stock-app
     kubectl logs deployment/mongodb
 
+<img width="1918" height="1138" alt="Screenshot 2026-02-01 172659" src="https://github.com/user-attachments/assets/e323aa06-b2f1-46c6-bcc1-b99c2a3a3884" />
 
 ---------------------------------------------------------------------------------------------------------
 **Cloud Build + Cloud Run**
