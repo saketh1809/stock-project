@@ -154,6 +154,23 @@ App Deployment:
 
 <img width="1918" height="1138" alt="Screenshot 2026-02-01 172659" src="https://github.com/user-attachments/assets/e323aa06-b2f1-46c6-bcc1-b99c2a3a3884" />
 
+**7. Delete the GKE cluster and container images:**
+
+    gcloud container clusters delete stock-cluster \
+      --zone europe-west1-d
+
+verify by:
+
+    gcloud container clusters list
+
+List the container images:
+
+    gcloud container images list
+
+Delete container images:
+
+     gcloud container images delete gcr.io/$PROJECT_ID/stock-app --force-delete-tags --quiet
+
 ---------------------------------------------------------------------------------------------------------
 **Cloud Build + Cloud Run**
 
