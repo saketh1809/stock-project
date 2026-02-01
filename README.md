@@ -60,9 +60,53 @@ steps for deploying the docker image:
     docker build -t stock-app-backend .
     docker compose up
 
-
+--------------------------------------------------------------------------------------------------------
 **Deploying using Google Cloud Services**
 
+**Cloud Shell + GKE + Docker + MongoDB**
+
+**1. Clone the Repository:**
+   
+    git clone https://github.com/saketh1809/stock-project.git
+    cd stock-project
+
+**2. GKE Cluster:**
+
+Creating a GKE cluster:
+
+    gcloud container clusters create stock-cluster \
+      --zone europe-west1-d \
+      --num-nodes 1 \
+      --scopes cloud-platform
+
+Connect kubectl:
+
+    gcloud container clusters get-credentials stock-cluster \
+      --zone europe-west1-d
+
+Verify:
+
+    kubectl get nodes
+
+**3.  Build & Push Docker Image (Cloud Build):**
+
+Set variables:
+
+    export PROJECT_ID=$(gcloud config get-value project)
+    export IMAGE_NAME=stock-app
+
+Build image:
+
+     gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE_NAME
+
+then confirm by:
+
+    gcloud container images list
+
+    
+
+
+---------------------------------------------------------------------------------------------------------
 **Cloud Build + Cloud Run**
 
 Open Cloud Shell & set project:
