@@ -257,6 +257,9 @@ Cloud Build:
       --allow-unauthenticated \
       --set-env-vars MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/stockapp"
 
+<img width="1919" height="1142" alt="image" src="https://github.com/user-attachments/assets/63ad554e-171e-41f0-8b7e-93ea9f7fffd1" />
+
+
 **6. Get application URL and Verify the logs**
 
 After deploy, you’ll see:
