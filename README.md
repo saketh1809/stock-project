@@ -174,46 +174,94 @@ Delete container images:
 ---------------------------------------------------------------------------------------------------------
 **Cloud Build + Cloud Run**
 
-Open Cloud Shell & set project:
+**1. Prepare MongoDB**
 
-    gcloud config set project YOUR_PROJECT_ID
-    gcloud config set run/region us-central1
+- Cloud Run containers are stateless and cannot run MongoDB inside them.
 
-Enable required services (one-time):
+1. Create a MongoDB Atlas cluster
+2. Create DB user
+3. Network Access → allow 0.0.0.0/0 (lab only)
+4. Copy connection string:
 
-    gcloud services enable \
-      run.googleapis.com \
-      artifactregistry.googleapis.com \
-      cloudbuild.googleapis.com
+       mongodb+srv://USER:PASSWORD@cluster.mongodb.net/stockapp
+
+**2. Small Fix to Your App are required (like in Dockerfile):**
 
 Clone your repository:
 
-    git clone https://github.com/saketh1809/stock-project.git
-    cd stock-project
+        git clone https://github.com/saketh1809/stock-project.git
+        cd stock-project
 
-Create Artifact Registry (one-time):
+Update Dockerfile: 
 
-    gcloud artifacts repositories create stock-repo \
-      --repository-format=docker \
-      --location=us-central1 \
-      --description="Stock App Docker Repo"
+       FROM python:3.11-slim
 
-Configure Docker authentication:
+        WORKDIR /app
+        
+        COPY requirements.txt .
+        
+        RUN pip install --upgrade pip && \
+            pip install -r requirements.txt
+        
+        COPY . .
+        
+        ENV PORT=8080
+        
+        EXPOSE 8080
+        
+        CMD ["gunicorn", "-b", ":8080", "app:app"]
 
-    gcloud auth configure-docker us-central1-docker.pkg.dev
+- Update Requirement.txt file (add gunicorn in the requirement.txt file)
+- Without gunicorn → container crashes instantly → Cloud Run fails
 
-Push image to Artifact Registry:
+**3. Enable required services (one-time):**
 
-    docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest
+        gcloud services enable \
+          run.googleapis.com \
+          artifactregistry.googleapis.com \
+          cloudbuild.googleapis.com
 
-Build Docker image:
+**4. Build Container Using Cloud Build**
 
-    docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest .
-  
+Set variables:
+
+    export PROJECT_ID=$(gcloud config get-value project)
+    export REGION=europe-west1
+    export SERVICE_NAME=stock-app
+
 Cloud Build:
 
     gcloud builds submit \
-      --tag us-central1-docker.pkg.dev/YOUR_PROJECT_ID/stock-repo/stock-app:latest
+      --tag gcr.io/$PROJECT_ID/$SERVICE_NAME
 
+**5. Deploy to Cloud Run:**
+
+    gcloud run deploy $SERVICE_NAME \
+      --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
+      --platform managed \
+      --region $REGION \
+      --allow-unauthenticated \
+      --set-env-vars MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/stockapp"
+
+**6. Get application URL and Verify the logs**
+
+After deploy, you’ll see:
+
+    Service URL: https://stock-app-xxxxx-ew.a.run.app
+
+Verify Logs:
+
+    gcloud run services logs read stock-app --region europe-west1
+
+Or:
+- Console → Cloud Run → Service → Logs
+  
+
+<img width="1920" height="1137" alt="image" src="https://github.com/user-attachments/assets/8ed9ec50-0afd-4cf3-9c41-6b7b0b17e0b0" />
+
+
+**7. To Destroy the Services:**
+
+       gcloud run services delete stock-app --region europe-west1
 
 
