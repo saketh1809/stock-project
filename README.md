@@ -176,6 +176,20 @@ Delete container images:
 
 **1. Prepare MongoDB**
 
+If MongoDB were inside Cloud Run:
+- Data disappears on scale-down
+- Multiple instances = data corruption
+- No persistent disk
+
+👉 Cloud Run = stateless compute
+
+You must use:
+- Managed database
+- Externally reachable
+- Persistent
+
+That’s why **MongoDB Atlas** is required here.
+
 - Cloud Run containers are stateless and cannot run MongoDB inside them.
 
 1. Create a MongoDB Atlas cluster
